@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { message, context } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
 
     if (apiKey) {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -61,6 +61,7 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    return NextResponse.json({ reply: 'Oops! Kuch problem aagayi server par. Please try again later. 😅' }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ reply: `Vercel Debug Error: ${errorMsg}` }, { status: 500 });
   }
 }
