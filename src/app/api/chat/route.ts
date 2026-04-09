@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    return NextResponse.json({ reply: `Vercel Debug Error: ${errorMsg}` }, { status: 500 });
+    return NextResponse.json({ reply: 'Oops! Kuch problem aagayi server par. Please try again later. 😅' }, { status: 500 });
   }
 }
