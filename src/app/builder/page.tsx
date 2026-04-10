@@ -1,7 +1,8 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import styles from './builder.module.css';
+import { supabase } from '@/lib/supabase';
 
 interface WorkExperience {
   id: string;
@@ -102,6 +103,16 @@ export default function BuilderPage() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   
+  // Auth State
+  const [user, setUser] = useState<any>(null);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [isLoginMode, setIsLoginMode] = useState(true);
+  const [authError, setAuthError] = useState('');
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'error' | null>(null);
+  
   // Chat Assistant State
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState<{role: 'user'|'ai', content: string}[]>([
@@ -111,6 +122,90 @@ export default function BuilderPage() {
   const [chatLoading, setChatLoading] = useState(false);
   
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Check for session on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchResume(session.user.id);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) fetchResume(session.user.id);
+      else setData(defaultData); // Clear on logout
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!user) return;
+    
+    const timeout = setTimeout(() => {
+      saveResume();
+    }, 2000); // Auto-save after 2s of no typing
+
+    return () => clearTimeout(timeout);
+  }, [data, user]);
+
+  const fetchResume = async (userId: string) => {
+    const { data: resumes, error } = await supabase
+      .from('resumes')
+      .select('resume_data')
+      .eq('user_id', userId)
+      .single();
+
+    if (resumes?.resume_data) {
+      setData(resumes.resume_data);
+    }
+  };
+
+  const saveResume = async () => {
+    if (!user) return;
+    setSaveStatus('saving');
+    const { error } = await supabase
+      .from('resumes')
+      .upsert({ 
+        user_id: user.id, 
+        resume_data: data,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+
+    if (error) {
+      console.error('Save error:', error);
+      setSaveStatus('error');
+    } else {
+      setSaveStatus('saved');
+    }
+  };
+
+  const handleAuth = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    setIsAuthLoading(true);
+
+    try {
+      if (isLoginMode) {
+        const { error } = await supabase.auth.signInWithPassword({ email: authEmail, password: authPassword });
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.auth.signUp({ email: authEmail, password: authPassword });
+        if (error) throw error;
+        alert('Verification link sent! Please check your email.');
+      }
+      setAuthModalOpen(false);
+    } catch (err: any) {
+      setAuthError(err.message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -299,6 +394,16 @@ export default function BuilderPage() {
           <div className={styles.sidebarLogo}>
             <span className={styles.logoIcon}>◈</span>
             <span className="gradient-text">ResumeAI</span>
+          </div>
+          <div className={styles.authControl}>
+            {user ? (
+              <div className={styles.userProfile}>
+                <span className={styles.userInitial}>{user.email[0].toUpperCase()}</span>
+                <button className={styles.logoutBtn} onClick={handleSignOut}>Exit</button>
+              </div>
+            ) : (
+              <button className={styles.loginBtn} onClick={() => setAuthModalOpen(true)}>Login</button>
+            )}
           </div>
         </div>
 
@@ -682,8 +787,13 @@ export default function BuilderPage() {
       {/* Resume Preview */}
       <main className={styles.previewWrapper}>
         <div className={styles.previewHeader}>
-          <span className="badge badge-emerald">● Live Preview</span>
-          <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>Updates as you type</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span className="badge badge-emerald">● Live Preview</span>
+            {saveStatus === 'saving' && <span className={styles.saveBadge}>☁ Saving...</span>}
+            {saveStatus === 'saved' && <span className={styles.saveBadge}>✓ Cloud Saved</span>}
+            {saveStatus === 'error' && <span className={styles.saveBadge} style={{ color: '#ef4444' }}>✕ Sync Error</span>}
+          </div>
+          <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>v1.0 Pro</span>
         </div>
         <div className={styles.previewOuter}>
           <div 
@@ -848,6 +958,53 @@ export default function BuilderPage() {
           </div>
         </div>
       </main>
+
+      {/* Auth Modal */}
+      {authModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={`${styles.modal} fade-in`}>
+            <div className={styles.modalHeader}>
+              <h3>{isLoginMode ? 'Login to ResumeAI' : 'Create Pro Account'}</h3>
+              <button onClick={() => setAuthModalOpen(false)}>✕</button>
+            </div>
+            <p className={styles.modalSubtitle}>
+              {isLoginMode ? 'Welcome back! Your resumes are waiting.' : 'Save your resumes to the cloud for free.'}
+            </p>
+            <form onSubmit={handleAuth} className={styles.modalForm}>
+              {authError && <div className={styles.errorBanner}>{authError}</div>}
+              <div className={styles.field}>
+                <label className="label">Email Address</label>
+                <input 
+                  type="email" 
+                  className="input" 
+                  required 
+                  value={authEmail} 
+                  onChange={e => setAuthEmail(e.target.value)} 
+                />
+              </div>
+              <div className={styles.field}>
+                <label className="label">Password</label>
+                <input 
+                  type="password" 
+                  className="input" 
+                  required 
+                  value={authPassword} 
+                  onChange={e => setAuthPassword(e.target.value)} 
+                />
+              </div>
+              <button className="btn btn-primary" type="submit" disabled={isAuthLoading}>
+                {isAuthLoading ? <span className="spinner" /> : (isLoginMode ? 'Sign In' : 'Create Account')}
+              </button>
+            </form>
+            <div className={styles.modalFooter}>
+              {isLoginMode ? "Don't have an account?" : "Already have an account?"}
+              <button onClick={() => setIsLoginMode(!isLoginMode)}>
+                {isLoginMode ? 'Sign Up' : 'Log In'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Floating Chat Assistant */}
       <div className={styles.chatWrapper}>

@@ -837,3 +837,117 @@
   border-radius: 4px;
   font-size: 11px;
 }
+
+/* Auth & Cloud Save Styles */
+.authControl {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.loginBtn {
+  background: var(--gradient-main);
+  border: none;
+  color: white;
+  padding: 6px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(139,92,246,0.3);
+  transition: all 0.2s;
+}
+.loginBtn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(139,92,246,0.5); }
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.userInitial {
+  width: 32px;
+  height: 32px;
+  background: var(--accent-purple);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  border: 2px solid var(--border);
+}
+.logoutBtn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.logoutBtn:hover { color: #ef4444; border-color: #ef4444; }
+
+.saveBadge {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+  animation: fadeIn 0.5s ease;
+}
+
+/* Modal Overlay & Card */
+.modalOverlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: #0d1120;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+}
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.modalHeader h3 { font-size: 20px; font-weight: 800; margin: 0; }
+.modalHeader button { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px; }
+.modalSubtitle { color: var(--text-secondary); font-size: 13px; margin-bottom: 24px; }
+.modalForm { display: flex; flex-direction: column; gap: 20px; }
+.modalFooter {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.modalFooter button {
+  background: none;
+  border: none;
+  color: var(--accent-purple);
+  font-weight: 700;
+  margin-left: 6px;
+  cursor: pointer;
+}
+.errorBanner {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.2);
+  color: #ef4444;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-align: center;
+}
