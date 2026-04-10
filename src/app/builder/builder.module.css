@@ -958,3 +958,57 @@
   font-size: 12px;
   text-align: center;
 }
+
+/* Photo Customization Styles */
+.photoStylesRow {
+  display: flex;
+  gap: 20px;
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  animation: fadeInUp 0.3s ease;
+}
+
+.shapeControls {
+  display: flex;
+  gap: 4px;
+  background: rgba(0,0,0,0.2);
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.shapeBtn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shapeBtn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+}
+
+.shapeBtnActive {
+  background: var(--accent-purple) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(139,92,246,0.3);
+}
+
+.resumePhotoWrapper {
+  transition: border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1), border 0.3s ease;
+}
+.resumePhoto {
+  transition: filter 0.3s ease;
+}

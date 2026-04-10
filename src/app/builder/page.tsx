@@ -55,6 +55,9 @@ interface ResumeData {
   };
   themeColor: string;
   fontFamily: string;
+  photoShape: 'circle' | 'square' | 'rounded';
+  photoGrayscale: boolean;
+  photoBorder: boolean;
 }
 
 const defaultData: ResumeData = {
@@ -89,6 +92,9 @@ const defaultData: ResumeData = {
   },
   themeColor: '#1a1a2a', // Default professional dark color
   fontFamily: 'Georgia, serif',
+  photoShape: 'circle',
+  photoGrayscale: false,
+  photoBorder: false,
 };
 
 type LoadingKey = 'summary' | 'skills' | string;
@@ -457,6 +463,51 @@ export default function BuilderPage() {
                     <input type="file" accept="image/*" onChange={handlePhotoUpload} className="input" style={{ flex: 1, padding: 8 }} />
                     {data.photo && <button className="btn btn-secondary" onClick={removePhoto} style={{ padding: '8px 16px' }}>Remove</button>}
                   </div>
+                  
+                  {data.photo && (
+                    <div className={styles.photoStylesRow}>
+                      <div className={styles.field}>
+                        <label className="label">Photo Shape</label>
+                        <div className={styles.shapeControls}>
+                          <button 
+                            className={`${styles.shapeBtn} ${data.photoShape === 'circle' ? styles.shapeBtnActive : ''}`}
+                            onClick={() => update('photoShape', 'circle')}
+                            title="Circle"
+                          >
+                            ◯
+                          </button>
+                          <button 
+                            className={`${styles.shapeBtn} ${data.photoShape === 'rounded' ? styles.shapeBtnActive : ''}`}
+                            onClick={() => update('photoShape', 'rounded')}
+                            title="Rounded Square"
+                          >
+                            ▢
+                          </button>
+                          <button 
+                            className={`${styles.shapeBtn} ${data.photoShape === 'square' ? styles.shapeBtnActive : ''}`}
+                            onClick={() => update('photoShape', 'square')}
+                            title="Exact Square"
+                          >
+                            ▭
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className={styles.field}>
+                        <label className="label">Effects</label>
+                        <div style={{ display: 'flex', gap: 12, marginTop: 4 }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
+                            <input type="checkbox" checked={data.photoGrayscale} onChange={e => setData(prev => ({ ...prev, photoGrayscale: e.target.checked }))} />
+                            B&W
+                          </label>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, cursor: 'pointer' }}>
+                            <input type="checkbox" checked={data.photoBorder} onChange={e => setData(prev => ({ ...prev, photoBorder: e.target.checked }))} />
+                            Border
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -808,8 +859,21 @@ export default function BuilderPage() {
             {/* Header */}
             <div className={`${styles.resumeHeader} ${data.photo ? styles.resumeHeaderWithPhoto : ''}`}>
               {data.photo && (
-                <div className={styles.resumePhotoWrapper}>
-                  <img src={data.photo} alt="Profile" className={styles.resumePhoto} />
+                <div 
+                  className={styles.resumePhotoWrapper}
+                  style={{ 
+                    borderRadius: data.photoShape === 'circle' ? '50%' : data.photoShape === 'rounded' ? '12px' : '0',
+                    border: data.photoBorder ? `2px solid var(--resume-accent)` : 'none'
+                  }}
+                >
+                  <img 
+                    src={data.photo} 
+                    alt="Profile" 
+                    className={styles.resumePhoto} 
+                    style={{ 
+                      filter: data.photoGrayscale ? 'grayscale(1)' : 'none'
+                    }}
+                  />
                 </div>
               )}
               <div className={styles.resumeHeaderContent}>
