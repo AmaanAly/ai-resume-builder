@@ -99,7 +99,7 @@ const defaultData: ResumeData = {
 
 type LoadingKey = 'summary' | 'skills' | string;
 
-const API_BASE_URL = 'https://ai-resume-builder-amaan-alys-projects.vercel.app';
+const API_BASE_URL = 'https://ai-resume-builder-red-one.vercel.app';
 
 export default function BuilderPage() {
   const [data, setData] = useState<ResumeData>(defaultData);
