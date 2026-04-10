@@ -52,6 +52,8 @@ interface ResumeData {
     date: string;
     place: string;
   };
+  themeColor: string;
+  fontFamily: string;
 }
 
 const defaultData: ResumeData = {
@@ -84,6 +86,8 @@ const defaultData: ResumeData = {
     date: '',
     place: '',
   },
+  themeColor: '#1a1a2a', // Default professional dark color
+  fontFamily: 'Georgia, serif',
 };
 
 type LoadingKey = 'summary' | 'skills' | string;
@@ -94,6 +98,9 @@ export default function BuilderPage() {
   const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'additional' | 'design'>('personal');
   const [template, setTemplate] = useState<'classic' | 'professional' | 'minimalist' | 'creative' | 'executive' | 'academic'>('classic');
   const [isDownloading, setIsDownloading] = useState(false);
+  const [jobDescription, setJobDescription] = useState('');
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   
   // Chat Assistant State
   const [chatOpen, setChatOpen] = useState(false);
@@ -231,6 +238,45 @@ export default function BuilderPage() {
     generate('skills', ctx, (text) => update('skills', text));
   };
 
+  const analyzeResume = async () => {
+    setIsAnalyzing(true);
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data, jobDescription }),
+      });
+      const json = await res.json();
+      setAnalysisResult(json);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const translateResume = async () => {
+    setLoadingKey('translation', true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          message: 'Translate my entire resume data into Hindi (but keep technical terms in English). Return ONLY the translated JSON data for summary, experience, education, and skills.', 
+          context: data 
+        }),
+      });
+      const json = await res.json();
+      // Handle the parsed response if it's JSON, or just show in chat
+      setChatMessages(prev => [...prev, { role: 'ai', content: 'Bhai, translation ready hai! Aap isay review karke copy karlo:\n\n' + json.reply }]);
+      setChatOpen(true);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingKey('translation', false);
+    }
+  };
+
   const downloadPDF = async () => {
     setIsDownloading(true);
     try {
@@ -258,14 +304,14 @@ export default function BuilderPage() {
 
         {/* Tabs */}
         <div className={styles.tabs}>
-          {(['personal', 'experience', 'education', 'skills', 'additional', 'design'] as const).map(tab => (
+          {(['personal', 'experience', 'education', 'skills', 'additional', 'smart', 'design'] as const).map(tab => (
             <button
               key={tab}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(tab)}
               id={`tab-${tab}`}
             >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === 'smart' ? '✨ Smart' : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </div>
@@ -495,10 +541,92 @@ export default function BuilderPage() {
             </div>
           )}
 
-          {/* Design Tab */}
+          {/* Additional Tab content... */}
+          {/* (I'll keep this in memory, just adding the next block) */}
+          
+          {/* Smart Tab */}
+          {activeTab === 'smart' && (
+            <div className={styles.formSection}>
+              <div className="section-title">ATS Analytics</div>
+              <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginBottom: 8 }}>
+                Analyze your resume against current market standards.
+              </p>
+              <button className={`btn btn-primary ${styles.aiBtn}`} onClick={analyzeResume} disabled={isAnalyzing}>
+                {isAnalyzing ? <><span className="spinner" /> Scanning...</> : <>📊 Calculate ATS Score</>}
+              </button>
+              
+              {analysisResult && (
+                <div className={styles.analysisCard}>
+                  <div className={styles.analysisHeader}>
+                    <div className={styles.scoreCircle}>
+                      <span>{analysisResult.atsScore || analysisResult.matchScore || 0}%</span>
+                      <small>Score</small>
+                    </div>
+                    <div>
+                      <h4 style={{ margin: 0 }}>Analysis Ready</h4>
+                      <p style={{ fontSize: 11, color: 'var(--text-muted)' }}>Based on LLaMA 3.3 Pro</p>
+                    </div>
+                  </div>
+                  
+                  {analysisResult.matchScore !== undefined && (
+                    <div className={styles.matchStats}>
+                      <strong>Job Match: {analysisResult.matchScore}%</strong>
+                      {analysisResult.missingKeywords?.length > 0 && (
+                        <div style={{ marginTop: 8 }}>
+                          <small style={{ color: '#ef4444' }}>Missing Keywords:</small>
+                          <div className={styles.keywordTags}>
+                            {analysisResult.missingKeywords.map((k: string) => <span key={k}>{k}</span>)}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {analysisResult.topTips && (
+                    <div className={styles.analysisTips}>
+                      <strong>Actionable Tips:</strong>
+                      <ul>
+                        {analysisResult.topTips.map((tip: string, i: number) => <li key={i}>{tip}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {analysisResult.suggestions && (
+                    <div className={styles.analysisTips}>
+                      <strong>Suggestions:</strong>
+                      <ul>
+                        {analysisResult.suggestions.map((s: string, i: number) => <li key={i}>{s}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="divider" />
+              <div className="section-title">JD Matcher</div>
+              <div className={styles.field}>
+                <label className="label">Target Job Description</label>
+                <textarea 
+                  className="input" 
+                  rows={6} 
+                  placeholder="Paste the job requirements here to find matches..." 
+                  value={jobDescription} 
+                  onChange={e => setJobDescription(e.target.value)} 
+                />
+              </div>
+              <button className={`btn btn-secondary ${styles.aiBtn}`} onClick={analyzeResume} disabled={isAnalyzing} style={{ marginTop: 8 }}>
+                ✨ Check JD Compatibility
+              </button>
+
+              <div className="divider" />
+              <div className="section-title">AI Quick Tools</div>
+              <button className={`btn btn-ghost ${styles.aiBtn}`} onClick={translateResume} disabled={loading['translation']}>
+                {loading['translation'] ? <><span className="spinner" /> Translating...</> : <>🌐 Translate to Hinglish/Hindi</>}
+              </button>
+            </div>
+          )}
           {activeTab === 'design' && (
             <div className={styles.formSection}>
-              <div className="section-title">Choose Template</div>
+              <div className="section-title">Themes</div>
               <div className={styles.templateGrid}>
                 {['classic', 'professional', 'minimalist', 'creative', 'executive', 'academic'].map(t => (
                   <button
@@ -509,6 +637,36 @@ export default function BuilderPage() {
                     {t.charAt(0).toUpperCase() + t.slice(1)}
                   </button>
                 ))}
+              </div>
+
+              <div className="divider" />
+              <div className="section-title">Accent Color</div>
+              <div className={styles.colorGrid}>
+                {['#1a1a2a', '#2b6cb0', '#800000', '#065f46', '#5b21b6', '#d97706'].map(color => (
+                  <button 
+                    key={color} 
+                    className={`${styles.colorCircle} ${data.themeColor === color ? styles.colorCircleActive : ''}`} 
+                    style={{ background: color }}
+                    onClick={() => update('themeColor', color)}
+                  />
+                ))}
+                <div className={styles.customColorBox}>
+                  <input type="color" className={styles.customColorPicker} value={data.themeColor} onChange={e => update('themeColor', e.target.value)} />
+                  <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>Custom</span>
+                </div>
+              </div>
+
+              <div className="divider" />
+              <div className="section-title">Typography (Fonts)</div>
+              <div className={styles.field}>
+                <select className="input" value={data.fontFamily} onChange={e => update('fontFamily', e.target.value)}>
+                  <option value="Georgia, serif">Georgia (Classic)</option>
+                  <option value="'Helvetica Neue', Arial, sans-serif">Helvetica (Professional)</option>
+                  <option value="'Inter', sans-serif">Inter (Modern)</option>
+                  <option value="'Times New Roman', serif">Times New Roman (Academic)</option>
+                  <option value="'Outfit', sans-serif">Outfit (Creative)</option>
+                  <option value="'Courier New', Courier, monospace">Courier (Technical)</option>
+                </select>
               </div>
             </div>
           )}
@@ -528,7 +686,15 @@ export default function BuilderPage() {
           <span style={{ color: 'var(--text-muted)', fontSize: 13 }}>Updates as you type</span>
         </div>
         <div className={styles.previewOuter}>
-          <div className={`${styles.resumePreview} ${styles[`template${template.charAt(0).toUpperCase() + template.slice(1)}`]}`} ref={previewRef} id="resume-preview">
+          <div 
+            className={`${styles.resumePreview} ${styles[`template${template.charAt(0).toUpperCase() + template.slice(1)}`]}`} 
+            ref={previewRef} 
+            id="resume-preview"
+            style={{ 
+              '--resume-accent': data.themeColor,
+              fontFamily: data.fontFamily 
+            } as any}
+          >
             {/* Header */}
             <div className={`${styles.resumeHeader} ${data.photo ? styles.resumeHeaderWithPhoto : ''}`}>
               {data.photo && (
