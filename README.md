@@ -1,45 +1,51 @@
 <div align="center">
-  <h1>🚀 AI Resume Builder (ResumeAI)</h1>
-  <p>A smart, fast, and highly customizable resume builder powered by Google Gemini AI.<br> Built with Next.js 14.</p>
 
-  <a href="https://ai-resume-builder-amaan-alys-projects.vercel.app"><b>🔴 Live Demo</b></a> •
-  <a href="#features"><b>✨ Features</b></a> •
-  <a href="#installation"><b>💻 Installation</b></a>
+![ResumeAI Banner](public/metadata/banner.png)
+
+# ◈ ResumeAI: The Pro SaaS Builder
+
+**An Advanced AI-Powered Resume Builder built with Next.js 14, Groq AI (LLaMA 3.3), and Supabase.**
+
+[Live Demo](https://ai-resume-builder-amaan-alys-projects.vercel.app) • [View Features](#-key-features) • [Tech Stack](#-tech-stack)
+
 </div>
 
 ---
 
-## 💡 About
-ResumeAI is an intuitive web application designed to help users build their perfect resume in minutes. It features a fully integrated **Hinglish/English AI Assistant** (powered by Gemini 2.0) that acts as a friendly helper to write high-impact summaries, powerful bullet points, and extract relevant skills based on user context.
+## 🚀 Key Features
 
-**Crafted with ❤️ by Amaan Aly**
-
----
-
-## ✨ Features
-*   **🤖 Smart AI Chat Assistant:** Floating assistant that chats in Hinglish/English. Automatically generates summaries, bullet points, and skills using `gemini-2.0-flash`.
-*   **🎨 6 Premium Templates:** Instantly switch between Classic, Professional, Minimalist, Creative, Executive, and Academic styles without losing your data.
-*   **👁️ Live Preview:** Watch your resume update in real-time right alongside the input form.
-*   **📸 Photo Upload:** Support for uploading and processing passport-size profile pictures dynamically via Base64.
-*   **🖨️ PDF Export:** Print-optimized CSS perfectly scales and formats the resume for clean PDF downloads.
-*   **⚡ Fully Responsive:** Seamless UI/UX built with independent CSS Modules and zero dependencies like Tailwind.
+- **✨ AI-Driven Generation:** Automatically generate professional summaries, work experience bullet points, and skills using **LLaMA 3.3 Pro** (via Groq API).
+- **📊 ATS Scoring Engine:** Real-time analysis of your resume against market standards with actionable tips to beat the Applicant Tracking Systems.
+- **☁️ Cloud Sync & Persistence:** Secure user authentication and real-time auto-save using **Supabase**. Your resumes are always safe and accessible.
+- **🎨 Premium Themes & Fonts:** 10+ professional templates (Modern Sidebar, Luxury Serif, Tech Mono, etc.) and high-end Google Fonts (Montserrat, Poppins, Playfair Display).
+- **🌐 AI Quick Tools:** Bilingual support with AI-powered translation (English to Hinglish/Hindi) and custom section generators.
+- **📸 Dynamic Photo Styling:** Custom shapes (Circle, Rounded, Square), border controls, and grayscale effects for a professional headshot.
+- **📄 Instant PDF Export:** High-quality PDF generation with localized printing support.
 
 ---
 
-## 🛠️ Tech Stack
-*   **Framework:** Next.js 14 (App Router)
-*   **Library:** React 18
-*   **Language:** TypeScript
-*   **Styling:** Vanilla CSS Modules (Custom Design System & Variables)
-*   **AI Backend:** Google Generative AI (`@google/generative-ai`)
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Frontend** | Next.js 14 (App Router), React, Vanilla CSS |
+| **Backend/AI** | Groq API (LLaMA-3.3-70B-Versatile) |
+| **Database/Auth** | Supabase (PostgreSQL + Auth) |
+| **Infrastructure** | Vercel |
+| **Design** | Flexbox, CSS Grid, Responsive Layouts |
 
 ---
 
-## 🚀 Installation & Local Setup
+## 📸 Mockups
 
-Want to run this project locally? Follow these steps:
+> [!NOTE]
+> Check out the **Design** tab in the app to switch between 10+ unique themes including our new **★ Modern Sidebar** and **★ Luxury Serif** editions.
 
-1. **Clone the repository:**
+---
+
+## ⚙️ Development Setup
+
+1. **Clone the repo:**
    ```bash
    git clone https://github.com/AmaanAly/ai-resume-builder.git
    cd ai-resume-builder
@@ -50,24 +56,26 @@ Want to run this project locally? Follow these steps:
    npm install
    ```
 
-3. **Configure Environment Variables:**
-   Create a `.env.local` file in the root directory and add your free Google AI Studio API Key:
+3. **Set up Environment Variables:**
+   Create a `.env.local` file with the following:
    ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
+   GROQ_API_KEY=your_key
+   NEXT_PUBLIC_SUPABASE_URL=your_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key
    ```
 
-4. **Start the development server:**
+4. **Run the development server:**
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+---
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## ☕ Support the Creator
-If this setup helped you land a job or you just love the UI, consider supporting!
-*   **Email:** khanamaan770@gmail.com
-*   **UPI Demo ID:** khanamaan770@ptyes
-
-<p align="center"><i>Happy coding and good luck with the interviews! 🎉</i></p>
+<div align="center">
+  Developed with ❤️ by <strong>Amaan</strong>
+</div>
