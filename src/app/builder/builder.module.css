@@ -1012,3 +1012,99 @@
 .resumePhoto {
   transition: filter 0.3s ease;
 }
+
+/* --- Premium Layout & Themes --- */
+
+.resumeBody {
+  margin-top: 10px;
+}
+.resumeMainColumns {
+  display: flex;
+  flex-direction: column;
+}
+.resumeColumnMain, .resumeColumnSide {
+  flex: 1;
+}
+.sidePersonalInfo {
+  font-size: 11px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+.sidePersonalInfo p { margin: 4px 0; }
+
+/* 7. Modern Sidebar (Split Layout) */
+.templateModernSidebar .resumeMainColumns {
+  flex-direction: row !important;
+  gap: 30px;
+}
+.templateModernSidebar .resumeColumnSide {
+  flex: 0 0 200px;
+  order: -1;
+  border-right: 1px solid #eee;
+  padding-right: 20px;
+}
+.templateModernSidebar .resumeSectionTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 13px;
+  border-bottom: 2px solid var(--resume-accent);
+  margin-bottom: 12px;
+}
+.templateModernSidebar .resumeSectionLine { display: none; }
+
+/* 8. Luxury Serif */
+.templateLuxuryExecutive {
+  font-family: 'Playfair Display', serif;
+}
+.templateLuxuryExecutive .resumeName {
+  font-size: 42px;
+  text-align: center;
+}
+.templateLuxuryExecutive .resumeContact {
+  justify-content: center;
+  border-top: 1px solid #1a1a2a;
+  border-bottom: 1px solid #1a1a2a;
+  padding: 8px 0;
+  margin: 15px 0;
+}
+.templateLuxuryExecutive .resumeSectionTitle {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 900;
+  font-style: italic;
+  font-size: 20px;
+}
+
+/* 9. Tech Mono (Minimal Grid) */
+.templateTechMinimalist {
+  font-family: 'Space Grotesk', sans-serif;
+}
+.templateTechMinimalist .resumeSectionTitle {
+  background: #000;
+  color: #fff;
+  padding: 4px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  display: inline-block;
+  margin-bottom: 15px;
+}
+.templateTechMinimalist .resumeSectionLine { display: none; }
+.templateTechMinimalist .resumeSkillTag {
+  border-radius: 0;
+  background: #f4f4f5;
+  border: 1px solid #000;
+  font-weight: bold;
+}
+
+/* 10. Dark Noir (Digital Edition) */
+.templateDarkNoir {
+  background: #020617 !important;
+  color: #cbd5e1 !important;
+}
+.templateDarkNoir .resumeName { color: #fff !important; }
+.templateDarkNoir .resumeSectionTitle { color: var(--resume-accent) !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.templateDarkNoir .resumeContact span { color: #64748b; }
+.templateDarkNoir .resumeEntryHeader strong { color: #f8fafc; }
+.templateDarkNoir .resumeSkillTag { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.1); }
+.templateDarkNoir .personalInfoTable td { color: #94a3b8; }

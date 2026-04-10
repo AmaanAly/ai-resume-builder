@@ -103,7 +103,7 @@ export default function BuilderPage() {
   const [data, setData] = useState<ResumeData>(defaultData);
   const [loading, setLoading] = useState<Record<LoadingKey, boolean>>({});
   const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'additional' | 'smart' | 'design'>('personal');
-  const [template, setTemplate] = useState<'classic' | 'professional' | 'minimalist' | 'creative' | 'executive' | 'academic'>('classic');
+  const [template, setTemplate] = useState<'classic' | 'professional' | 'minimalist' | 'creative' | 'executive' | 'academic' | 'modernSidebar' | 'luxuryExecutive' | 'techMinimalist' | 'darkNoir'>('classic');
   const [isDownloading, setIsDownloading] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -784,13 +784,24 @@ export default function BuilderPage() {
             <div className={styles.formSection}>
               <div className="section-title">Themes</div>
               <div className={styles.templateGrid}>
-                {['classic', 'professional', 'minimalist', 'creative', 'executive', 'academic'].map(t => (
+                {[
+                  { id: 'classic', label: 'Classic' },
+                  { id: 'professional', label: 'Professional' },
+                  { id: 'minimalist', label: 'Minimalist' },
+                  { id: 'creative', label: 'Creative' },
+                  { id: 'executive', label: 'Executive' },
+                  { id: 'academic', label: 'Academic' },
+                  { id: 'modernSidebar', label: '★ Modern Sidebar' },
+                  { id: 'luxuryExecutive', label: '★ Luxury Serif' },
+                  { id: 'techMinimalist', label: '★ Tech Mono' },
+                  { id: 'darkNoir', label: '★ Dark Noir' }
+                ].map(t => (
                   <button
-                    key={t}
-                    className={`${styles.templateBtn} ${template === t ? styles.templateBtnActive : ''}`}
-                    onClick={() => setTemplate(t as any)}
+                    key={t.id}
+                    className={`${styles.templateBtn} ${template === t.id ? styles.templateBtnActive : ''}`}
+                    onClick={() => setTemplate(t.id as any)}
                   >
-                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                    {t.label}
                   </button>
                 ))}
               </div>
@@ -816,12 +827,23 @@ export default function BuilderPage() {
               <div className="section-title">Typography (Fonts)</div>
               <div className={styles.field}>
                 <select className="input" value={data.fontFamily} onChange={e => update('fontFamily', e.target.value)}>
-                  <option value="Georgia, serif">Georgia (Classic)</option>
-                  <option value="'Helvetica Neue', Arial, sans-serif">Helvetica (Professional)</option>
-                  <option value="'Inter', sans-serif">Inter (Modern)</option>
-                  <option value="'Times New Roman', serif">Times New Roman (Academic)</option>
-                  <option value="'Outfit', sans-serif">Outfit (Creative)</option>
-                  <option value="'Courier New', Courier, monospace">Courier (Technical)</option>
+                  <optgroup label="Professional & Modern">
+                    <option value="Montserrat, sans-serif">Montserrat (Geometric Premium)</option>
+                    <option value="Poppins, sans-serif">Poppins (Modern Clean)</option>
+                    <option value="'Inter', sans-serif">Inter (UI Standard)</option>
+                    <option value="'Helvetica Neue', Arial, sans-serif">Helvetica (Executive)</option>
+                  </optgroup>
+                  <optgroup label="Elegant & Classic">
+                    <option value="'Playfair Display', serif">Playfair Display (Luxury Serif)</option>
+                    <option value="Lora, serif">Lora (Elegant Editorial)</option>
+                    <option value="Georgia, serif">Georgia (Classic Book)</option>
+                    <option value="'Times New Roman', serif">Times New Roman (Academic)</option>
+                  </optgroup>
+                  <optgroup label="Creative & Tech">
+                    <option value="'Space Grotesk', sans-serif">Space Grotesk (Modern Tech)</option>
+                    <option value="Syne, sans-serif">Syne (Creative Bold)</option>
+                    <option value="'Courier New', Courier, monospace">Terminal (Technical)</option>
+                  </optgroup>
                 </select>
               </div>
             </div>
@@ -884,134 +906,130 @@ export default function BuilderPage() {
                   {data.location && <><span>·</span><span>{data.location}</span></>}
                   {data.linkedin && <><span>·</span><span>{data.linkedin}</span></>}
                   {data.website && <><span>·</span><span>{data.website}</span></>}
-                </div>
-              </div>
-            </div>
-
-            {/* Summary */}
-            {data.summary && (
-              <div className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>Professional Summary</h2>
-                <div className={styles.resumeSectionLine} />
-                <p className={styles.resumeSummary}>{data.summary}</p>
-              </div>
-            )}
-
-            {/* Experience */}
-            {data.experience.some(e => e.company || e.role) && (
-              <div className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>Work Experience</h2>
-                <div className={styles.resumeSectionLine} />
-                {data.experience.map(exp => (
-                  (exp.company || exp.role) ? (
-                    <div key={exp.id} className={styles.resumeEntry}>
-                      <div className={styles.resumeEntryHeader}>
-                        <div>
-                          <strong className={styles.resumeRole}>{exp.role || 'Role'}</strong>
-                          {exp.company && <span className={styles.resumeCompany}> · {exp.company}</span>}
-                        </div>
-                        {exp.duration && <span className={styles.resumeDuration}>{exp.duration}</span>}
-                      </div>
-                      {exp.bullets ? (
-                        <ul className={styles.resumeBullets}>
-                          {exp.bullets.split('\n').filter(b => b.trim()).map((b, i) => (
-                            <li key={i}>{b.replace(/^[•\-]\s*/, '')}</li>
-                          ))}
-                        </ul>
-                      ) : exp.description ? (
-                        <p className={styles.resumeDesc}>{exp.description}</p>
-                      ) : null}
+                  {/* Body Wrapper for Layouts */}
+            <div className={styles.resumeBody}>
+              <div className={styles.resumeMainColumns}>
+                {/* Main Column (Usually Left or Full) */}
+                <div className={styles.resumeColumnMain}>
+                  {/* Summary */}
+                  {data.summary && (
+                    <div className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>Professional Summary</h2>
+                      <div className={styles.resumeSectionLine} />
+                      <p className={styles.resumeDesc}>{data.summary}</p>
                     </div>
-                  ) : null
-                ))}
-              </div>
-            )}
+                  )}
 
-            {/* Education */}
-            {data.education.some(e => e.institution || e.degree) && (
-              <div className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>Education</h2>
-                <div className={styles.resumeSectionLine} />
-                {data.education.map(edu => (
-                  (edu.institution || edu.degree) ? (
-                    <div key={edu.id} className={styles.resumeEntry}>
-                      <div className={styles.resumeEntryHeader}>
-                        <div>
-                          <strong className={styles.resumeRole}>{edu.degree || 'Degree'}</strong>
-                          {edu.institution && <span className={styles.resumeCompany}> · {edu.institution}</span>}
-                        </div>
-                        {edu.year && <span className={styles.resumeDuration}>{edu.year}</span>}
-                      </div>
+                  {/* Experience */}
+                  {data.experience.some(e => e.company || e.role) && (
+                    <div className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>Work Experience</h2>
+                      <div className={styles.resumeSectionLine} />
+                      {data.experience.map(exp => (
+                        (exp.company || exp.role) ? (
+                          <div key={exp.id} className={styles.resumeEntry}>
+                            <div className={styles.resumeEntryHeader}>
+                              <div>
+                                <strong className={styles.resumeRole}>{exp.role || 'Role'}</strong>
+                                {exp.company && <span className={styles.resumeCompany}> · {exp.company}</span>}
+                              </div>
+                              {exp.duration && <span className={styles.resumeDuration}>{exp.duration}</span>}
+                            </div>
+                            {exp.bullets ? (
+                              <ul className={styles.resumeBullets}>
+                                {exp.bullets.split('\n').filter(b => b.trim()).map((b, i) => (
+                                  <li key={i}>{b.replace(/^[•\-]\s*/, '')}</li>
+                                ))}
+                              </ul>
+                            ) : exp.description ? (
+                              <p className={styles.resumeDesc}>{exp.description}</p>
+                            ) : null}
+                          </div>
+                        ) : null
+                      ))}
                     </div>
-                  ) : null
-                ))}
-              </div>
-            )}
+                  )}
 
-            {/* Skills */}
-            {skills.length > 0 && (
-              <div className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>Skills</h2>
-                <div className={styles.resumeSectionLine} />
-                <div className={styles.resumeSkills}>
-                  {skills.map((skill, i) => (
-                    <span key={i} className={styles.resumeSkillTag}>{skill}</span>
+                  {/* Custom Sections */}
+                  {data.customSections.map(s => (s.title || s.content) && (
+                    <div key={s.id} className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>{s.title || 'Untitled Section'}</h2>
+                      <div className={styles.resumeSectionLine} />
+                      <div className={styles.resumeDesc} style={{ whiteSpace: 'pre-wrap' }}>{s.content}</div>
+                    </div>
                   ))}
+
+                  {/* Declaration */}
+                  {data.declaration && (
+                    <div className={styles.resumeSection} style={{ marginTop: 25 }}>
+                      <h2 className={styles.resumeSectionTitle}>Declaration</h2>
+                      <div className={styles.resumeSectionLine} />
+                      <p className={styles.resumeDesc}>{data.declaration}</p>
+                    </div>
+                  )}
+
+                  {/* Signature Block */}
+                  {data.showSignature && (
+                    <div className={styles.signatureBlock}>
+                      <div className={styles.sigLeft}>
+                        <p><strong>Place:</strong> {data.signatureData.place}</p>
+                        <p><strong>Date:</strong> {data.signatureData.date}</p>
+                      </div>
+                      <div className={styles.sigRight}>
+                        <div className={styles.sigLine} />
+                        <p><strong>{data.name || 'Your Name'}</strong></p>
+                        <p>(Signature)</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
 
-            {/* Custom Sections */}
-            {data.customSections.map(s => (s.title || s.content) && (
-              <div key={s.id} className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>{s.title || 'Untitled Section'}</h2>
-                <div className={styles.resumeSectionLine} />
-                <div className={styles.resumeDesc} style={{ whiteSpace: 'pre-wrap' }}>{s.content}</div>
-              </div>
-            ))}
+                {/* Side Column (Sidebar for Split Layouts) */}
+                <div className={styles.resumeColumnSide}>
+                  {/* Skills */}
+                  {skills.length > 0 && (
+                    <div className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>Skills</h2>
+                      <div className={styles.resumeSectionLine} />
+                      <div className={styles.resumeSkills}>
+                        {skills.map((skill, i) => (
+                          <span key={i} className={styles.resumeSkillTag}>{skill}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-            {/* Personal Details (Table) */}
-            {Object.values(data.personalDetails).some(v => v) && (
-              <div className={styles.resumeSection}>
-                <h2 className={styles.resumeSectionTitle}>Personal Details</h2>
-                <div className={styles.resumeSectionLine} />
-                <table className={styles.personalInfoTable}>
-                  <tbody>
-                    {data.personalDetails.fatherName && <tr><td><strong>Father's Name</strong></td><td>: {data.personalDetails.fatherName}</td></tr>}
-                    {data.personalDetails.dob && <tr><td><strong>Date of Birth</strong></td><td>: {data.personalDetails.dob}</td></tr>}
-                    {data.personalDetails.gender && <tr><td><strong>Gender</strong></td><td>: {data.personalDetails.gender}</td></tr>}
-                    {data.personalDetails.maritalStatus && <tr><td><strong>Marital Status</strong></td><td>: {data.personalDetails.maritalStatus}</td></tr>}
-                    {data.personalDetails.nationality && <tr><td><strong>Nationality</strong></td><td>: {data.personalDetails.nationality}</td></tr>}
-                    {data.personalDetails.languages && <tr><td><strong>Languages Known</strong></td><td>: {data.personalDetails.languages}</td></tr>}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                  {/* Education */}
+                  {data.education.some(e => e.institution || e.degree) && (
+                    <div className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>Education</h2>
+                      <div className={styles.resumeSectionLine} />
+                      {data.education.map(edu => (
+                        (edu.institution || edu.degree) ? (
+                          <div key={edu.id} className={styles.resumeEntry}>
+                            <div className={styles.resumeRole}>{edu.degree || 'Degree'}</div>
+                            <div className={styles.resumeCompany}>{edu.institution}</div>
+                            {edu.year && <div className={styles.resumeDuration}>{edu.year}</div>}
+                          </div>
+                        ) : null
+                      ))}
+                    </div>
+                  )}
 
-            {/* Declaration */}
-            {data.declaration && (
-              <div className={styles.resumeSection} style={{ marginTop: 25 }}>
-                <h2 className={styles.resumeSectionTitle}>Declaration</h2>
-                <div className={styles.resumeSectionLine} />
-                <p className={styles.resumeDesc}>{data.declaration}</p>
-              </div>
-            )}
-
-            {/* Signature Block */}
-            {data.showSignature && (
-              <div className={styles.signatureBlock}>
-                <div className={styles.sigLeft}>
-                  <p><strong>Place:</strong> {data.signatureData.place}</p>
-                  <p><strong>Date:</strong> {data.signatureData.date}</p>
-                </div>
-                <div className={styles.sigRight}>
-                  <div className={styles.sigLine} />
-                  <p><strong>{data.name || 'Your Name'}</strong></p>
-                  <p>(Signature)</p>
-                </div>
-              </div>
-            )}
-
+                  {/* Personal Details */}
+                  {Object.values(data.personalDetails).some(v => v) && (
+                    <div className={styles.resumeSection}>
+                      <h2 className={styles.resumeSectionTitle}>Personal</h2>
+                      <div className={styles.resumeSectionLine} />
+                      <div className={styles.sidePersonalInfo}>
+                        {data.personalDetails.dob && <p><strong>DOB:</strong> {data.personalDetails.dob}</p>}
+                        {data.personalDetails.gender && <p><strong>Gender:</strong> {data.personalDetails.gender}</p>}
+                        {data.personalDetails.maritalStatus && <p><strong>Status:</strong> {data.personalDetails.maritalStatus}</p>}
+                        {data.personalDetails.nationality && <p><strong>Identity:</strong> {data.personalDetails.nationality}</p>}
+                        {data.personalDetails.languages && <p><strong>Languages:</strong> {data.personalDetails.languages}</p>}
+                      </div>
+                    </div>
+                  )}
             {/* Placeholder when empty */}
             {!data.name && !data.summary && !data.experience.some(e => e.company) && (
               <div className={styles.emptyPlaceholder}>
