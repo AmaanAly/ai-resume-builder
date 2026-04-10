@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+};
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
@@ -40,7 +50,14 @@ Instructions:
       });
 
       const text = completion.choices[0]?.message?.content || '';
-      return NextResponse.json({ reply: text });
+      const response = NextResponse.json({ reply: text });
+      
+      // Add CORS headers
+      response.headers.set('Access-Control-Allow-Origin', '*');
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      
+      return response;
     }
 
     // Fallback if no API key is provided
