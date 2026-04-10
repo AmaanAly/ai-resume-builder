@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata: Metadata = {
   title: "ResumeAI — Build Your Perfect Resume with AI",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="en">
       <body style={{ position: 'relative' }}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
