@@ -6,9 +6,21 @@
 
 **An Advanced AI-Powered Resume Builder built with Next.js 14, Groq AI (LLaMA 3.3), and Supabase.**
 
-[Live Demo](https://ai-resume-builder-amaan-alys-projects.vercel.app) • [View Features](#-key-features) • [Tech Stack](#-tech-stack)
+[Live Demo](https://ai-resume-builder-amaan-alys-projects.vercel.app) • [Download Android App](#-mobile-app) • [View Features](#-key-features) • [Tech Stack](#-tech-stack)
 
 </div>
+
+---
+
+## 📱 Mobile App
+
+Our AI Resume Builder is available as a native Android application! 
+
+### How to download:
+1. Go to the **Actions** tab of this repository.
+2. Select the latest **Build Android APK** workflow run.
+3. Scroll down to **Artifacts** and download `app-debug`.
+4. Install the `.apk` on your Android device.
 
 ---
 

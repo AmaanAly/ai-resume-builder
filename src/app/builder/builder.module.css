@@ -1108,3 +1108,28 @@
 .templateDarkNoir .resumeEntryHeader strong { color: #f8fafc; }
 .templateDarkNoir .resumeSkillTag { background: rgba(255,255,255,0.05); color: #fff; border-color: rgba(255,255,255,0.1); }
 .templateDarkNoir .personalInfoTable td { color: #94a3b8; }
+
+/* App Download Section */
+.appDownloadHeader {
+  margin-left: 20px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border-color);
+}
+.appIconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+.appIconBtn:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-2px);
+  border-color: var(--resume-accent);
+}

@@ -99,6 +99,8 @@ const defaultData: ResumeData = {
 
 type LoadingKey = 'summary' | 'skills' | string;
 
+const API_BASE_URL = 'https://ai-resume-builder-amaan-alys-projects.vercel.app';
+
 export default function BuilderPage() {
   const [data, setData] = useState<ResumeData>(defaultData);
   const [loading, setLoading] = useState<Record<LoadingKey, boolean>>({});
@@ -308,7 +310,7 @@ export default function BuilderPage() {
   const generate = async (section: string, context: string, onResult: (text: string) => void) => {
     setLoadingKey(section, true);
     try {
-      const res = await fetch('/api/generate', {
+      const res = await fetch(`${API_BASE_URL}/api/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section, context }),
@@ -342,7 +344,7 @@ export default function BuilderPage() {
   const analyzeResume = async () => {
     setIsAnalyzing(true);
     try {
-      const res = await fetch('/api/analyze', {
+      const res = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data, jobDescription }),
@@ -359,7 +361,7 @@ export default function BuilderPage() {
   const translateResume = async () => {
     setLoadingKey('translation', true);
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(`${API_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -400,6 +402,14 @@ export default function BuilderPage() {
           <div className={styles.sidebarLogo}>
             <span className={styles.logoIcon}>◈</span>
             <span className="gradient-text">ResumeAI</span>
+          </div>
+
+          <div className={styles.appDownloadHeader}>
+            <span style={{ fontSize: 10, color: 'var(--text-muted)', display: 'block' }}>Get Mobile App</span>
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              <a href="https://github.com/AmaanAly/ai-resume-builder/releases" target="_blank" className={styles.appIconBtn} title="Download Android APK">🤖</a>
+              <a href="#" className={styles.appIconBtn} title="iOS App (Coming Soon)" style={{ opacity: 0.5 }}>🍎</a>
+            </div>
           </div>
           <div className={styles.authControl}>
             {user ? (
@@ -1135,7 +1145,7 @@ export default function BuilderPage() {
                     setChatInput('');
                     setChatLoading(true);
                     
-                    fetch('/api/chat', {
+                    fetch(`${API_BASE_URL}/api/chat`, {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ message: chatInput, context: data })
