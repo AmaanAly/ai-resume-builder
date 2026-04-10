@@ -96,7 +96,7 @@ type LoadingKey = 'summary' | 'skills' | string;
 export default function BuilderPage() {
   const [data, setData] = useState<ResumeData>(defaultData);
   const [loading, setLoading] = useState<Record<LoadingKey, boolean>>({});
-  const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'additional' | 'design'>('personal');
+  const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'additional' | 'smart' | 'design'>('personal');
   const [template, setTemplate] = useState<'classic' | 'professional' | 'minimalist' | 'creative' | 'executive' | 'academic'>('classic');
   const [isDownloading, setIsDownloading] = useState(false);
   const [jobDescription, setJobDescription] = useState('');
