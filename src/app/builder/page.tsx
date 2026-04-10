@@ -906,7 +906,11 @@ export default function BuilderPage() {
                   {data.location && <><span>·</span><span>{data.location}</span></>}
                   {data.linkedin && <><span>·</span><span>{data.linkedin}</span></>}
                   {data.website && <><span>·</span><span>{data.website}</span></>}
-                  {/* Body Wrapper for Layouts */}
+                </div>
+              </div>
+            </div>
+
+            {/* Body Wrapper for Layouts */}
             <div className={styles.resumeBody}>
               <div className={styles.resumeMainColumns}>
                 {/* Main Column (Usually Left or Full) */}
@@ -1030,6 +1034,10 @@ export default function BuilderPage() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            </div>
+
             {/* Placeholder when empty */}
             {!data.name && !data.summary && !data.experience.some(e => e.company) && (
               <div className={styles.emptyPlaceholder}>
