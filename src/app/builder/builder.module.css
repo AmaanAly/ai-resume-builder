@@ -685,3 +685,50 @@
   .chatWindow { width: calc(100vw - 48px); height: 500px; }
   .chatBody { height: 100%; }
 }
+
+/* New Additional Styles */
+.personalInfoTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+.personalInfoTable td {
+  padding: 4px 0;
+  vertical-align: top;
+  font-size: 13px;
+  color: #444;
+}
+.personalInfoTable td:first-child {
+  width: 160px;
+}
+
+.signatureBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 60px;
+  padding-top: 20px;
+}
+.sigLeft p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #444;
+}
+.sigRight {
+  text-align: center;
+  min-width: 200px;
+}
+.sigLine {
+  border-top: 1.5px solid #1a1a2a;
+  margin-bottom: 8px;
+}
+.sigRight p {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #1a1a2a;
+}
+
+/* Template Specific Overrides for New Sections */
+.templateProfessional .personalInfoTable td:first-child { color: #2b6cb0; font-weight: bold; }
+.templateCreative .resumeSectionTitle { color: #f43f5e; }
+.templateMinimalist .personalInfoTable td { border-bottom: 1px solid #f0f0f0; padding: 8px 0; }

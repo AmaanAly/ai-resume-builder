@@ -19,6 +19,12 @@ interface Education {
   year: string;
 }
 
+interface CustomSection {
+  id: string;
+  title: string;
+  content: string;
+}
+
 interface ResumeData {
   name: string;
   email: string;
@@ -31,6 +37,21 @@ interface ResumeData {
   photo?: string;
   experience: WorkExperience[];
   education: Education[];
+  personalDetails: {
+    fatherName: string;
+    dob: string;
+    gender: string;
+    maritalStatus: string;
+    nationality: string;
+    languages: string;
+  };
+  customSections: CustomSection[];
+  declaration: string;
+  showSignature: boolean;
+  signatureData: {
+    date: string;
+    place: string;
+  };
 }
 
 const defaultData: ResumeData = {
@@ -48,6 +69,21 @@ const defaultData: ResumeData = {
   education: [
     { id: '1', institution: '', degree: '', year: '' },
   ],
+  personalDetails: {
+    fatherName: '',
+    dob: '',
+    gender: '',
+    maritalStatus: '',
+    nationality: '',
+    languages: '',
+  },
+  customSections: [],
+  declaration: 'I hereby declare that the information furnished above is true to the best of my knowledge.',
+  showSignature: false,
+  signatureData: {
+    date: '',
+    place: '',
+  },
 };
 
 type LoadingKey = 'summary' | 'skills' | string;
@@ -55,7 +91,7 @@ type LoadingKey = 'summary' | 'skills' | string;
 export default function BuilderPage() {
   const [data, setData] = useState<ResumeData>(defaultData);
   const [loading, setLoading] = useState<Record<LoadingKey, boolean>>({});
-  const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'design'>('personal');
+  const [activeTab, setActiveTab] = useState<'personal' | 'experience' | 'education' | 'skills' | 'additional' | 'design'>('personal');
   const [template, setTemplate] = useState<'classic' | 'professional' | 'minimalist' | 'creative' | 'executive' | 'academic'>('classic');
   const [isDownloading, setIsDownloading] = useState(false);
   
@@ -97,6 +133,41 @@ export default function BuilderPage() {
     setData(prev => ({
       ...prev,
       education: prev.education.map(e => e.id === id ? { ...e, [field]: value } : e),
+    }));
+  };
+
+  const updatePersonalDetail = (field: keyof ResumeData['personalDetails'], value: string) => {
+    setData(prev => ({
+      ...prev,
+      personalDetails: { ...prev.personalDetails, [field]: value }
+    }));
+  };
+
+  const updateSignatureData = (field: keyof ResumeData['signatureData'], value: string) => {
+    setData(prev => ({
+      ...prev,
+      signatureData: { ...prev.signatureData, [field]: value }
+    }));
+  };
+
+  const addCustomSection = () => {
+    setData(prev => ({
+      ...prev,
+      customSections: [...prev.customSections, { id: Date.now().toString(), title: '', content: '' }]
+    }));
+  };
+
+  const updateCustomSection = (id: string, field: 'title' | 'content', value: string) => {
+    setData(prev => ({
+      ...prev,
+      customSections: prev.customSections.map(s => s.id === id ? { ...s, [field]: value } : s)
+    }));
+  };
+
+  const removeCustomSection = (id: string) => {
+    setData(prev => ({
+      ...prev,
+      customSections: prev.customSections.filter(s => s.id !== id)
     }));
   };
 
@@ -187,7 +258,7 @@ export default function BuilderPage() {
 
         {/* Tabs */}
         <div className={styles.tabs}>
-          {(['personal', 'experience', 'education', 'skills', 'design'] as const).map(tab => (
+          {(['personal', 'experience', 'education', 'skills', 'additional', 'design'] as const).map(tab => (
             <button
               key={tab}
               className={`${styles.tab} ${activeTab === tab ? styles.tabActive : ''}`}
@@ -345,6 +416,85 @@ export default function BuilderPage() {
             </div>
           )}
 
+          {/* Additional Tab */}
+          {activeTab === 'additional' && (
+            <div className={styles.formSection}>
+              <div className="section-title">Personal Details</div>
+              <div className={styles.fieldGrid}>
+                <div className={styles.field}>
+                  <label className="label">Father's Name</label>
+                  <input className="input" value={data.personalDetails.fatherName} onChange={e => updatePersonalDetail('fatherName', e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className="label">Date of Birth</label>
+                  <input className="input" placeholder="01 Jan 1990" value={data.personalDetails.dob} onChange={e => updatePersonalDetail('dob', e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className="label">Gender</label>
+                  <input className="input" placeholder="Male / Female" value={data.personalDetails.gender} onChange={e => updatePersonalDetail('gender', e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className="label">Marital Status</label>
+                  <input className="input" placeholder="Single / Married" value={data.personalDetails.maritalStatus} onChange={e => updatePersonalDetail('maritalStatus', e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className="label">Nationality</label>
+                  <input className="input" value={data.personalDetails.nationality} onChange={e => updatePersonalDetail('nationality', e.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label className="label">Languages</label>
+                  <input className="input" placeholder="English, Hindi" value={data.personalDetails.languages} onChange={e => updatePersonalDetail('languages', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="divider" />
+              <div className="section-title">Custom Sections (Optional)</div>
+              {data.customSections.map((s) => (
+                <div key={s.id} className={styles.expCard}>
+                  <div className={styles.expCardHeader}>
+                    <input 
+                      className="input" 
+                      style={{ fontWeight: 'bold', background: 'transparent', border: 'none', padding: 0 }} 
+                      placeholder="Section Title (e.g. Awards)" 
+                      value={s.title} 
+                      onChange={e => updateCustomSection(s.id, 'title', e.target.value)} 
+                    />
+                    <button className={styles.removeBtn} onClick={() => removeCustomSection(s.id)}>✕</button>
+                  </div>
+                  <textarea className="input" rows={3} placeholder="Content..." value={s.content} onChange={e => updateCustomSection(s.id, 'content', e.target.value)} />
+                </div>
+              ))}
+              <button className={`btn btn-secondary ${styles.addBtn}`} onClick={addCustomSection}>
+                + Add Custom Section
+              </button>
+
+              <div className="divider" />
+              <div className="section-title">Declaration & Signature</div>
+              <div className={styles.field}>
+                <label className="label">Declaration Text</label>
+                <textarea className="input" rows={3} value={data.declaration} onChange={e => update('declaration', e.target.value)} />
+              </div>
+              
+              <div className={styles.field} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10 }}>
+                <input type="checkbox" id="show-sig" checked={data.showSignature} onChange={e => setData(prev => ({ ...prev, showSignature: e.target.checked }))} />
+                <label htmlFor="show-sig" style={{ cursor: 'pointer' }}>Show Signature Block</label>
+              </div>
+
+              {data.showSignature && (
+                <div className={styles.fieldGrid} style={{ marginTop: 10 }}>
+                  <div className={styles.field}>
+                    <label className="label">Place</label>
+                    <input className="input" value={data.signatureData.place} onChange={e => updateSignatureData('place', e.target.value)} />
+                  </div>
+                  <div className={styles.field}>
+                    <label className="label">Date</label>
+                    <input className="input" value={data.signatureData.date} onChange={e => updateSignatureData('date', e.target.value)} />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Design Tab */}
           {activeTab === 'design' && (
             <div className={styles.formSection}>
@@ -467,6 +617,57 @@ export default function BuilderPage() {
                   {skills.map((skill, i) => (
                     <span key={i} className={styles.resumeSkillTag}>{skill}</span>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {/* Custom Sections */}
+            {data.customSections.map(s => (s.title || s.content) && (
+              <div key={s.id} className={styles.resumeSection}>
+                <h2 className={styles.resumeSectionTitle}>{s.title || 'Untitled Section'}</h2>
+                <div className={styles.resumeSectionLine} />
+                <div className={styles.resumeDesc} style={{ whiteSpace: 'pre-wrap' }}>{s.content}</div>
+              </div>
+            ))}
+
+            {/* Personal Details (Table) */}
+            {Object.values(data.personalDetails).some(v => v) && (
+              <div className={styles.resumeSection}>
+                <h2 className={styles.resumeSectionTitle}>Personal Details</h2>
+                <div className={styles.resumeSectionLine} />
+                <table className={styles.personalInfoTable}>
+                  <tbody>
+                    {data.personalDetails.fatherName && <tr><td><strong>Father's Name</strong></td><td>: {data.personalDetails.fatherName}</td></tr>}
+                    {data.personalDetails.dob && <tr><td><strong>Date of Birth</strong></td><td>: {data.personalDetails.dob}</td></tr>}
+                    {data.personalDetails.gender && <tr><td><strong>Gender</strong></td><td>: {data.personalDetails.gender}</td></tr>}
+                    {data.personalDetails.maritalStatus && <tr><td><strong>Marital Status</strong></td><td>: {data.personalDetails.maritalStatus}</td></tr>}
+                    {data.personalDetails.nationality && <tr><td><strong>Nationality</strong></td><td>: {data.personalDetails.nationality}</td></tr>}
+                    {data.personalDetails.languages && <tr><td><strong>Languages Known</strong></td><td>: {data.personalDetails.languages}</td></tr>}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Declaration */}
+            {data.declaration && (
+              <div className={styles.resumeSection} style={{ marginTop: 25 }}>
+                <h2 className={styles.resumeSectionTitle}>Declaration</h2>
+                <div className={styles.resumeSectionLine} />
+                <p className={styles.resumeDesc}>{data.declaration}</p>
+              </div>
+            )}
+
+            {/* Signature Block */}
+            {data.showSignature && (
+              <div className={styles.signatureBlock}>
+                <div className={styles.sigLeft}>
+                  <p><strong>Place:</strong> {data.signatureData.place}</p>
+                  <p><strong>Date:</strong> {data.signatureData.date}</p>
+                </div>
+                <div className={styles.sigRight}>
+                  <div className={styles.sigLine} />
+                  <p><strong>{data.name || 'Your Name'}</strong></p>
+                  <p>(Signature)</p>
                 </div>
               </div>
             )}
