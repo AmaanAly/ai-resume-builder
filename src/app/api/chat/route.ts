@@ -1,66 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { message, context } = body;
 
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    // Use Groq API via OpenAI SDK
+    const apiKey = process.env.GROQ_API_KEY?.trim();
 
     if (apiKey) {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+      const openai = new OpenAI({
+        apiKey: apiKey,
+        baseURL: 'https://api.groq.com/openai/v1',
+      });
 
       // Build context string from the current resume data
       const resumeContext = `
-      User Resume Profile Context:
-      Name: ${context.name || 'Not provided'}
-      Role/Title: ${context.experience?.[0]?.role || 'Not provided'}
-      Summary: ${context.summary || 'Not provided'}
-      Skills: ${context.skills || 'Not provided'}
-      Experience: ${JSON.stringify(context.experience)}
-      Education: ${JSON.stringify(context.education)}
-      `;
+You are an expert bilingual (English and Roman Urdu / Hinglish) resume writer AI assistant. 
+The user is building their resume. Here is their current data:
+Name: ${context?.name || 'Not provided'}
+Summary: ${context?.summary || 'Not provided'}
+Experience: ${context?.experience?.map((e: any) => `${e.role} at ${e.company}`).join(', ') || 'Not provided'}
+Education: ${context?.education?.map((e: any) => `${e.degree} at ${e.institution}`).join(', ') || 'Not provided'}
+Skills: ${context?.skills || 'Not provided'}
 
-      const prompt = `
-      You are a highly skilled, friendly, and expert AI Resume Builder Assistant named "ResumeAI". 
-      Your job is to help the user write their resume, suggest improvements, and answer their questions.
-      
-      CRITICAL INSTRUCTION FOR LANGUAGE:
-      You MUST communicate in a friendly mix of English and written Hindi (Hinglish). 
-      For example: "Haan bilkul! Main aapki help kar sakta hoon. Here are some great bullet points for your Software Engineer role..."
-      
-      CRITICAL INSTRUCTION FOR TONE:
-      Be extremely encouraging, professional but casual (like a helpful friend).
-      
-      CRITICAL INSTRUCTION FOR FORMATTING:
-      Keep your answers concise. Use bullet points for suggestions so the user can easily copy them. Do NOT use markdown code blocks (\`\`\`) unless writing actual programming code. Just use text.
-      
-      ${resumeContext}
-      
-      User Message: ${message}
-      `;
+Instructions: 
+1. Be extremely helpful and conversational.
+2. Reply in a natural, friendly mix of Hindi/Urdu written in English alphabet (Hinglish/Roman Urdu) and English terminology (like "Experience section", "Bullet points"). 
+3. If the user asks you to write something for their resume (like a summary or bullet points), write it highly professionally in ENGLISH, and then explicitly encourage them to copy it.
+4. Keep your responses concise. No lengthy greetings.`;
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      const completion = await openai.chat.completions.create({
+        messages: [
+          { role: 'system', content: resumeContext },
+          { role: 'user', content: message }
+        ],
+        model: 'llama-3.3-70b-versatile',
+      });
+
+      const text = completion.choices[0]?.message?.content || '';
       return NextResponse.json({ reply: text });
     }
 
-    // Mock Response if no API key
-    await new Promise(r => setTimeout(r, 1000));
+    // Fallback if no API key is provided
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Simple logic for mock responses
-    let reply = "Arey bhai, aapne abhi tak **GEMINI_API_KEY** configure nahi ki hai! 😅 Asli maza aur Hinglish chat ke liye `.env.local` mein API key daalo.\n\nLekin fikar mat karo, yeh raha ek sample text jo aap copy kar sakte ho:\n\n• Developed and maintained modern web applications using React and Next.js.\n• Collaborated with cross-functional teams to deliver projects on time.\n• Improved website performance by 40%.";
-    
-    if (message.toLowerCase().includes('summary')) {
-      reply = "API key missing hai, warna main ekdum zabardast summary likh deta! 🚀\n\nAbhi ke liye yeh use kar lo:\n\nPassionate professional with fresh ideas and a strong desire to learn and grow. Eager to contribute to team success through hard work, attention to detail, and excellent organizational skills.";
-    }
-
-    return NextResponse.json({ reply });
+    return NextResponse.json({ 
+      reply: 'Bhai jaan, lagta hai aapne abhi tak `GROQ_API_KEY` apne `.env.local` ya Vercel environment variables mein set nahi ki hai! Usay set karein aur phir try karein. 🚀'
+    });
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    return NextResponse.json({ reply: 'Oops! Kuch problem aagayi server par. Please try again later. 😅' }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ reply: `[API Error]: ${errorMsg}` }, { status: 500 });
   }
 }

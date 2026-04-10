@@ -1,17 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { section, context } = body;
 
-    // Use Gemini API if key available, otherwise fall back to intelligent mock
-    const apiKey = process.env.GEMINI_API_KEY?.trim();
+    // Use Groq API via OpenAI SDK
+    const apiKey = process.env.GROQ_API_KEY?.trim();
 
     if (apiKey) {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
+      const openai = new OpenAI({
+        apiKey: apiKey,
+        baseURL: 'https://api.groq.com/openai/v1',
+      });
 
       let prompt = '';
       if (section === 'summary') {
@@ -34,8 +36,12 @@ Details: ${context}
 Return ONLY a comma-separated list of skills, nothing else.`;
       }
 
-      const result = await model.generateContent(prompt);
-      const text = result.response.text();
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+      });
+
+      const text = completion.choices[0]?.message?.content || '';
       return NextResponse.json({ result: text });
     }
 
