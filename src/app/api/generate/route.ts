@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
     const { section, context } = body;
 
     // Use Gemini API if key available, otherwise fall back to intelligent mock
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY?.trim();
 
     if (apiKey) {
       const genAI = new GoogleGenerativeAI(apiKey);
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 Details: ${context}
 Make it powerful, results-oriented, and in first-person without using "I". 
 Return ONLY the summary text, no extra commentary.`;
-      } else if (section === 'bullets') {
+      } else if (section.startsWith('bullets')) {
         prompt = `Transform this job experience into 3-4 powerful resume bullet points.
 Details: ${context}
 Requirements:
@@ -50,6 +50,7 @@ Return ONLY a comma-separated list of skills, nothing else.`;
     return NextResponse.json({ result: mocks[section] || mocks.summary });
   } catch (error) {
     console.error('Generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ result: `[API Error]: ${errorMsg}` }, { status: 500 });
   }
 }
